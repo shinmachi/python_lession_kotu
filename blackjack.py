@@ -1,6 +1,35 @@
 import random
 
 RANK, SUIT = 0, 1
+
+def player_op(deck, player_hand, op):
+    doubled, ending = False, False
+    if op == '1':
+        print('[ プレイヤー : スタンド ]')
+        doubled, ending = False, True
+    elif op == '2':
+        print('[ プレイヤー : ヒット ]')
+        player_hand.append(deck.pop())
+        print_player_hand(player_hand)
+        doubled, ending = False, False
+    elif op == '3':
+        if len(player_hand) == 2:
+            print('[ プレイヤー : ダブル ]')
+            player_hand.append(deck.pop())
+            print_player_hand(player_hand)
+            doubled, ending = True, True
+        else:
+            print('( ダブルはできません。)')
+
+    if get_point(player_hand) > 21:
+        print('[ プレイヤーはバストした！]')
+        ending = True
+    elif get_point(player_hand) == 21:
+        print( '21です！')
+        ending = True
+
+    return doubled, ending
+
 def get_point(hand):
     result = 0
     ace_flag = False
@@ -56,6 +85,9 @@ def main():
         player_hand = [] # list of player hand
         dealer_hand = [] # list of dealer hand
         deck = make_deck() # make dack
+        bet = 10
+        player_money -= bet
+
         # print(deck)
         for i in range(2):
             player_hand.append(deck.pop())
@@ -70,18 +102,12 @@ def main():
         # プレイヤーターン
         while True:
             op = input('スタンド : 1,  ヒット : 2,  ダブル : 3  > ')
-            if op == '1':
-                print('[ プレイヤー : スタンド ]')
+            doubled, ending = player_op(deck, player_hand, op)
+            if doubled: # doubled processing
+                player_money -= bet
+                bet += bet
+            if ending: # turn end
                 break
-            elif op == '2':
-                print('[ プレイヤー : ヒット ]')
-                player_hand.append(deck.pop())
-                print_player_hand(player_hand)
-            elif op == '3':
-                print('[ プレイヤー : ダブル ]')
-            else:
-                continue
-
 
         turn += 1
         input('次のターンへ')
